@@ -1,3 +1,4 @@
+import Weather from "./Weather.jsx";
 const Country = ({countries}) => {
     const country = countries[0];
 
@@ -13,6 +14,7 @@ const Country = ({countries}) => {
                 ))}
             </ul>
             <img src={country.flags.png} alt={country.flags.alt}></img>
+            <Weather capital={country.capital[0]} latitude={country.capitalInfo.latlng[0]} longitud={country.capitalInfo.latlng[1]} />
         </div>
     );
 }
