@@ -1,11 +1,11 @@
 import "../styles/notification.css";
-const Notification = ({message}) => {
+const Notification = ({message, messageType}) => {
     if (message === null){
         return null;
     }
 
     return(
-        <div className='message'>
+        <div className={messageType}>
             {message}
         </div>
     );
