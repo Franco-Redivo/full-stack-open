@@ -31,16 +31,24 @@ const App = () => {
     if(newName === '' || newPhone === ''){
       alert("missing value");
     }else{
+      const existingContact = persons.find(p => p.name === newName);
       const array = persons.filter(person => person.name === newName);
-      (array.length > 0) 
-      ? 
-      alert(`${newName} is already added to phonebook`)
-      :
-      (contactService
-        .create(newPerson)
-        .then(returnedContact => {
-          setPersons(persons.concat(returnedContact))
-        })); 
+      console.log(existingContact);
+      if(array.length > 0){
+        if(window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)){
+          contactService
+          .update(existingContact.id,newPerson)
+          .then(returnedContact => {
+            setPersons(persons.filter(contact => contact.id !== existingContact.id).concat(returnedContact));
+          });
+        }
+      }else{
+        contactService
+          .create(newPerson)
+          .then(returnedContact => {
+            setPersons(persons.concat(returnedContact))
+          }); 
+      } 
       
       setNewName('');
       setNewPhone('');
