@@ -3,12 +3,14 @@ import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
 import contactService from "./services/contacts.js";
+import Notification from "./components/Notification.jsx";
 
 const App = () => {
   const [persons, setPersons] = useState([]); 
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [filterValue, setFilterValue] = useState('');
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     contactService
@@ -41,13 +43,21 @@ const App = () => {
           .then(returnedContact => {
             setPersons(persons.filter(contact => contact.id !== existingContact.id).concat(returnedContact));
           });
+          setNotification(`${newName}'s number updated`);
+          setTimeout(() =>{
+            setNotification(null);
+          },5000);
         }
       }else{
         contactService
           .create(newPerson)
           .then(returnedContact => {
             setPersons(persons.concat(returnedContact))
-          }); 
+          });
+        setNotification(`Added ${newName}`);
+        setTimeout(() =>{
+          setNotification(null);
+        },5000);   
       } 
       
       setNewName('');
@@ -78,6 +88,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification}/>
       <Filter handleFilter={handleFilter} filterValue={filterValue}/>
       <h2>Add a new</h2>
       <PersonForm handleNameChange={handleNameChange} newName={newName} handlePhoneChange={handlePhoneChange} newPhone={newPhone} handleAddPerson={handleAddPerson}/>
