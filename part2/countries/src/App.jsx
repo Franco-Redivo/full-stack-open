@@ -28,10 +28,15 @@ function App() {
     setFilterValue(newFilter);
     setFilteredCountries(countries);
   }
+
+  const handleCountrySelect = (country) => {
+    setFilteredCountries([country]);
+  }
+
   return (
     <>
       <Filter handleChange={handleFilter} value={filterValue}/>
-      <Content countries={filteredCountries}/>
+      <Content countries={filteredCountries} handleCountrySelect={handleCountrySelect}/>
     </>
   )
 }

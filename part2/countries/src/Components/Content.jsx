@@ -1,13 +1,13 @@
 import Countries from "./Countries.jsx";
 import Country from "./Country.jsx";
 
-const Content = ({countries}) => {
+const Content = ({countries, handleCountrySelect}) => {
     if(countries.length > 10){
         return <p>Too many matches ({countries.length}),be more specific</p>
     }
 
     if(countries.length <= 10 && countries.length > 1){
-        return <Countries countries={countries}/>
+        return <Countries countries={countries} onShow={handleCountrySelect}/>
     }
 
     if(countries.length === 1){
