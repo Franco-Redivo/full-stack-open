@@ -1,4 +1,4 @@
-const Persons = ({filterValue, persons}) => {
+const Persons = ({filterValue, persons, handleDelete}) => {
 
     const filteredPersons = persons.filter(person =>
         person.name.toLowerCase().includes(filterValue.toLowerCase())
@@ -12,6 +12,7 @@ const Persons = ({filterValue, persons}) => {
             ).map(person => (
                 <div key={person.name}>
                 {person.name} {person.number}
+                <button value={person.id} onClick={handleDelete}>delete</button>
                 </div>
             ))}
         </div>
