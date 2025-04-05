@@ -1,8 +1,8 @@
 import { useState,useEffect } from 'react';
-import axios from 'axios';
 import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
+import contactService from "./services/contacts.js";
 
 const App = () => {
   const [persons, setPersons] = useState([]); 
@@ -11,11 +11,11 @@ const App = () => {
   const [filterValue, setFilterValue] = useState('');
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data);
-      })
+    contactService
+      .getAll()
+      .then(initialContacts => {
+        setPersons(initialContacts);
+      });
   },[]);
 
   const handleNameChange = (e) => {
@@ -32,7 +32,16 @@ const App = () => {
       alert("missing value");
     }else{
       const array = persons.filter(person => person.name === newName);
-      (array.length > 0) ? alert(`${newName} is already added to phonebook`)  : setPersons(persons.concat(newPerson));  
+      (array.length > 0) 
+      ? 
+      alert(`${newName} is already added to phonebook`)
+      :
+      (contactService
+        .create(newPerson)
+        .then(returnedContact => {
+          setPersons(persons.concat(returnedContact))
+        })); 
+      
       setNewName('');
       setNewPhone('');
     } 
