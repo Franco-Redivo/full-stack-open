@@ -54,10 +54,28 @@ app.delete('/api/persons/:id', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
     const newPerson = req.body;
+
+    if(!newPerson.name || !newPerson.number){
+        res.status(400).json({error: "Name or number missing"});
+    }
+    if(nameExists(newPerson.name)){
+        res.status(409).json({error: "Name must be unique"});
+    }
     newPerson.id = (Math.floor(Math.random() * 200)).toString();
     persons = persons.concat(newPerson);
     res.json(newPerson);
 });
+
+const nameExists = (name) => {
+    const array = persons.filter(person => person.name === name);
+
+    if(array.length > 0){
+        return true;
+    }else if(array.length === 0){
+        return false;
+    }
+}
+
 
 const PORT = 3001
 app.listen(PORT, () => {
