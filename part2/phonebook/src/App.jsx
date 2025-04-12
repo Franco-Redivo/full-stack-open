@@ -100,7 +100,7 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h2 className='main-title'>Phonebook</h2>
       <Notification message={notification} messageType={messageType}/>
       <Filter handleFilter={handleFilter} filterValue={filterValue}/>
       <h2>Add a new</h2>
