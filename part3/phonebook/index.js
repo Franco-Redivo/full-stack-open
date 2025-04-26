@@ -13,29 +13,15 @@ morgan.token('post', (req) => {
     return req.method === 'POST' ? JSON.stringify(req.body) : ' '
 });
 
-
-let persons = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message);
+    if(error.name === 'CastError'){
+        return res.status(400).send({error: 'malformatted id'});
     }
-];
+
+    next(error);
+}
+
 
 app.get('/api/persons',(req, res) => {
     Contact.find({}).then(contacts => {
@@ -45,25 +31,26 @@ app.get('/api/persons',(req, res) => {
 
 app.get('/info', (req, res) => {
     const date = new Date();
-    const info = `Phonebook has info for ${persons.length} people <br> ${date}`;
-    res.send(info);
+    Contact.find({}).then((contacts)=> {
+        res.send(`<p>Phonebook has info for ${contacts.length} people</p><p>${date}</p>`);
+    });
+    
 });
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Contact.findById(req.params.id).then(contact => {
         if(contact){
             res.json(contact);
         }else{
             res.status(404).end();
         }
-    })
+    }).catch(error => next(error));
 });
 
-app.delete('/api/persons/:id', (req, res) => {
-    const id = req.params.id;
-    persons = persons.filter(person => person.id !== id);
-
-    res.status(204).end();
+app.delete('/api/persons/:id', (req, res, next) => {
+    Contact.findByIdAndDelete(req.params.id).then(result => {
+        res.status(204).end();
+    }).catch(error => next(error));
 });
 
 app.post('/api/persons', (req, res) => {
@@ -85,16 +72,25 @@ app.post('/api/persons', (req, res) => {
     
 });
 
-const nameExists = (name) => {
-    const array = persons.filter(person => person.name === name);
+app.put('/api/persons/:id', (req, res, next) => {
+    const body = req.body;
+    
+    Contact.findById(req.params.id)
+        .then(contact => {
+            if (!contact){
+                return res.status(404).end();
+            }
+            // contact.name = body.name;
+            contact.number = body.number;
 
-    if(array.length > 0){
-        return true;
-    }else if(array.length === 0){
-        return false;
-    }
-}
+            return contact.save().then((updatedContact) => {
+                res.json(updatedContact);
+            });
+        }).catch(error => next(error));
+});
 
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
