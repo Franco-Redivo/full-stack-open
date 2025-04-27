@@ -1,24 +1,24 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+const mongoose = require('mongoose')
+require('dotenv').config()
 
-mongoose.set('strictQuery',false);
+mongoose.set('strictQuery',false)
 
 
 
-const url = process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI
 
-console.log('connecting to', url);
+console.log('connecting to', url)
 mongoose.connect(url)
-    .then(() => {
-        console.log('connected to MongoDB');
-    })
-    .catch((error) => {
-        console.log('error connecting to MongoDB:', error.message);
-    });
+  .then(() => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connecting to MongoDB:', error.message)
+  })
 
 const phoneValidator = (number) => {
-    var pattern = /^\d{2,3}-\d+$/
-    return pattern.test(number);
+  var pattern = /^\d{2,3}-\d+$/
+  return pattern.test(number)
 }
 
 const phoneSchema = new mongoose.Schema({
@@ -34,14 +34,14 @@ const phoneSchema = new mongoose.Schema({
     required: true,
     validate: phoneValidator
   }
-});
+})
 
 phoneSchema.set('toJSON', {
-    transform: (document, returnedObject) => {
-        returnedObject.id = returnedObject._id.toString();
-        delete returnedObject._id;
-        delete returnedObject.__v;
-    }
-});
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
 
-module.exports = mongoose.model('Contact', phoneSchema);
+module.exports = mongoose.model('Contact', phoneSchema)
