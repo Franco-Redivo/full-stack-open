@@ -51,3 +51,59 @@ describe('total Likes', () => {
         assert.strictEqual(result,37)
     })
 })
+
+describe('favourite blog', () => {
+    const listWithOneBlog = [
+        {
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+            likes: 5,
+            id: '5a422aa71b54a676234d17f8',
+        }
+    ]
+    const listWithTwoBlogs = [
+        {
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+            likes: 5,
+            id: '5a422aa71b54a676234d17f8',
+        },
+        {
+            title: 'Go To Statement Considered Harmful Pt 2',
+            author: 'Edsger W. Dijkstra',
+            url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+            likes: 32,
+            id: '6b642a71b54a676234d17f8',
+        }
+
+    ]
+    test('when list has only one blog, returns that', () => {
+        const result = listHelper.favoriteBlog(listWithOneBlog)
+        assert.deepStrictEqual(result, {
+            title: 'Go To Statement Considered Harmful',
+            author: 'Edsger W. Dijkstra',
+            url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+            likes: 5,
+            id: '5a422aa71b54a676234d17f8',
+        })
+    })
+
+    test('of empty list is null',() => {
+        const result = listHelper.favoriteBlog([])
+        assert.strictEqual(result, null)
+    })
+
+    test('of a bigger list is calculated right', () => {
+        const result = listHelper.favoriteBlog(listWithTwoBlogs)
+        assert.deepStrictEqual(result,{
+            title: 'Go To Statement Considered Harmful Pt 2',
+            author: 'Edsger W. Dijkstra',
+            url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+            likes: 32,
+            id: '6b642a71b54a676234d17f8',
+        })
+    })
+})
+
