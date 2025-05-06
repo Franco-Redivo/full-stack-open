@@ -37,7 +37,15 @@ const nonExistingId = async () => {
   const usersInDb = async () => {
     const users = await User.find({})
     return users.map(user => user.toJSON())
-  }  
+  }
+
+  
+  const loginUser = {
+    username: 'loginUser',
+    password: 'secret'
+  }
+  
+
   module.exports = {
-    initialBlogs, nonExistingId, blogsInDb, usersInDb
+    initialBlogs, nonExistingId, blogsInDb, usersInDb, loginUser
   }

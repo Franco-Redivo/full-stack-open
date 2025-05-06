@@ -2,14 +2,7 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog.js')
 const User = require('../models/user.js')
 const jwt = require('jsonwebtoken')
-
-const getTokenFrom = request => {
-    const authorization = request.get('authorization')
-    if (authorization && authorization.startsWith('Bearer ')) {
-      return authorization.replace('Bearer ', '')
-    }
-    return null
-}
+const { userExtractor } = require('../utils/middleware')
 
 
 blogsRouter.get('/',async (request, response) => {
@@ -17,14 +10,13 @@ blogsRouter.get('/',async (request, response) => {
     response.json(blogs)
 })
   
-blogsRouter.post('/',async (request, response) => {
+blogsRouter.post('/',userExtractor,async (request, response) => {
     const body = request.body
+    const { user } = request
 
-    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
-    if (!decodedToken.id) {
+    if (!user) {
       return response.status(401).json({ error: 'token invalid' })
     }
-    const user = await User.findById(decodedToken.id)
 
     if (!body.title || !body.url) {
         return response.status(400).json({ error: 'title or url is missing' })
@@ -35,7 +27,7 @@ blogsRouter.post('/',async (request, response) => {
         author: body.author,
         url: body.url,
         likes: body.likes ?? 0,
-        user: user._id,
+        user: user,
     })
     
     const savedBlog = await blog.save()
@@ -45,6 +37,22 @@ blogsRouter.post('/',async (request, response) => {
     response.status(201).json(savedBlog)
     
 
+})
+blogsRouter.delete('/:id',userExtractor,async(request, response) => {
+    const { user } = request
+
+    if(!user){
+        return response.status(401).json({error: 'token invalid'})
+    }
+    const blog = await Blog.findById(request.params.id)
+
+    if(blog.user.toString() === user._id.toString()){
+        await Blog.findByIdAndDelete(request.params.id)
+        response.status(204).end()
+    } else {
+        response.status(401).json({ error:'unauthorized access' })
+    }
+    
 })
 
 blogsRouter.get('/:id',async(request, response) => {
@@ -58,12 +66,6 @@ blogsRouter.get('/:id',async(request, response) => {
     
 })
 
-blogsRouter.delete('/:id',async(request, response) => {
-    
-    await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
-    
-})
 
 blogsRouter.put('/:id', async(request, response) => {
     const { likes } = request.body
