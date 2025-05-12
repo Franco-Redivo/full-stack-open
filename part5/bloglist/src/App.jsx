@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef} from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -13,6 +14,8 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null);
   const [messageType, setMessageType] = useState(null);
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -26,6 +29,7 @@ const App = () => {
     if(loggedUserJSON){
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      console.log(user)
       blogService.setToken(user.token)
     }
   }, [])
@@ -63,6 +67,7 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     try {
+      blogFormRef.current.toggleVisibility()
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
   
@@ -82,25 +87,72 @@ const App = () => {
     }
   }
 
+  const handleLike = async (blog) => {
+    const updatedBlog = {
+      ...blog,
+      likes: blog.likes + 1
+    }
+    try {
+      const returnedBlog = await blogService.update(blog.id, updatedBlog)
+      setBlogs(blogs.map(b => b.id !== blog.id ? b : returnedBlog))
+    } catch (error) {
+      setNotification('Error liking blog')
+      setMessageType('error')
+      setTimeout(() => {
+        setNotification(null)
+        setMessageType(null)
+      }, 5000)
+    }
+  }
+
+  const handleRemove = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      try {
+        await blogService.remove(blog.id)
+        setBlogs(blogs.filter(b => b.id !== blog.id))
+        setNotification(`Blog "${blog.title}" removed`)
+        setMessageType('message')
+        setTimeout(() => {
+          setNotification(null)
+          setMessageType(null)
+        }, 5000)
+      } catch (error) {
+        setNotification('Error removing blog')
+        setMessageType('error')
+        console.error('Error removing blog:', error)
+        setTimeout(() => {
+          setNotification(null)
+          setMessageType(null)
+        }, 5000)
+      }
+    }
+  }
+
 
   return (
     <div>
       <Notification message={notification} messageType={messageType}/>
       {user === null ? (
-        <LoginForm
-          handleLogin={handleLogin}
-          username={username}
-          password={password}
-          setUsername={setUsername}
-          setPassword={setPassword}
-          /> 
+        <Togglable buttonLabel='login'>
+          <LoginForm
+            handleLogin={handleLogin}
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            /> 
+        </Togglable>
       ):(
         <div>
           <p>{user.name} logged-in <button onClick={handleLogout}>logout</button></p>
-          <BlogForm createBlog={addBlog}/>
+          <Togglable buttonLabel='new blog' ref={blogFormRef}>
+            <BlogForm createBlog={addBlog}/>
+          </Togglable>
           <h2>blogs</h2>
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+          {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+            
+            <Blog key={blog.id} blog={blog} handleLike={handleLike} handleRemove={handleRemove} user={user} />
+            
           )}
         </div>
         )
