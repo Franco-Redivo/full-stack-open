@@ -29,7 +29,6 @@ const App = () => {
     if(loggedUserJSON){
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      console.log(user)
       blogService.setToken(user.token)
     }
   }, [])
@@ -53,6 +52,7 @@ const App = () => {
     } catch (exception) {
       setNotification('Wrong credentials')
       setMessageType('error')
+      console.error('Wrong credentials:', exception)
       setTimeout(() => {
         setNotification(null)
         setMessageType(null)
@@ -80,6 +80,7 @@ const App = () => {
     } catch (error) {
       setNotification('Error creating blog')
       setMessageType('error')
+      console.error('Error creating blog:', error)
       setTimeout(() => {
         setNotification(null)
         setMessageType(null)
@@ -98,6 +99,7 @@ const App = () => {
     } catch (error) {
       setNotification('Error liking blog')
       setMessageType('error')
+      console.error('Error liking blog:', error)
       setTimeout(() => {
         setNotification(null)
         setMessageType(null)
