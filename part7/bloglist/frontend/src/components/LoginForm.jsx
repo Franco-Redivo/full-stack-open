@@ -1,6 +1,42 @@
 import PropTypes from "prop-types"
+import { useDispatch,useSelector } from "react-redux"
+import { useState } from "react"
+import { setNotification } from '../reducers/notoficationReducer'
+import { logIn } from '../reducers/userReducer'
+import blogService from '../services/blogs'
 
-const LoginForm = ({handleLogin, username, password, handleUsernameChange, handlePasswordChange}) => (
+const LoginForm = () => { 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const dispatch = useDispatch()
+  const user = useSelector(state => state.user)
+  
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    
+    try {
+      const user = await dispatch(logIn({
+        username, password
+      }))
+
+      blogService.setToken(user.token)
+      dispatch(setNotification({
+        content: `Welcome ${user.name}`,
+        style: 'message'
+      }, 5))
+  
+      setUsername('')
+      setPassword('')
+    } catch (exception) {
+      dispatch(setNotification({
+        content: 'Wrong credentials',
+        style: 'error'
+      }, 5))
+      console.error('Wrong credentials:', exception)
+    }
+  }
+
+  return (
   <div>
     <h2>Log in to application</h2>
     <form onSubmit = {handleLogin}>
@@ -10,7 +46,7 @@ const LoginForm = ({handleLogin, username, password, handleUsernameChange, handl
          type="text"
          value={username}
          name="Username"
-         onChange={handleUsernameChange}/>
+         onChange={({ target }) => setUsername(target.value)}/>
       </div>
       <div>
         password
@@ -18,21 +54,13 @@ const LoginForm = ({handleLogin, username, password, handleUsernameChange, handl
           type="password"
           value={password}
           name="Password"
-          onChange={handlePasswordChange}
+          onChange={({ target }) => setPassword(target.value)}
         />
       </div>
       <button type="submit">login</button>
     </form>
   </div>
-)
-
-LoginForm.propTypes = {
-  handleLogin: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
-  handleUsernameChange: PropTypes.func.isRequired,
-  handlePasswordChange: PropTypes.func.isRequired
-}
+)}
 
 LoginForm.displayName = 'LoginForm'
 

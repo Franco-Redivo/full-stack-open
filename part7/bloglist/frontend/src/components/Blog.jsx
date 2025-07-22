@@ -1,11 +1,15 @@
 import { useState } from "react"
 import PropTypes from 'prop-types'
-const Blog = ({ blog, handleLike, handleRemove,user }) => {
+import { useDispatch } from 'react-redux'
+import { setNotification } from '../reducers/notoficationReducer'
+import { like, deleteBlog } from '../reducers/blogReducer'
+
+const Blog = ({ blog,user }) => {
   const [visible, setVisible] = useState(false)
   const [label, setLabel] = useState('view')
+
+  const dispatch = useDispatch()
   
-
-
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -14,21 +18,44 @@ const Blog = ({ blog, handleLike, handleRemove,user }) => {
     marginBottom: 5
   }
   
-  const showWhenVisible = {display: visible ? '' : 'none'}
-
-  const handleLikeCLick = () => {
-    handleLike(blog)
+  const likeBlog = async (blog) => {
+    try {
+      dispatch(like(blog))
+      dispatch(setNotification({
+        content: `Liked blog "${blog.title}"`,
+        style: 'message'
+      }, 5))
+    } catch (error) {
+      dispatch(setNotification({
+        content: `Error liking blog: ${error.message}`,
+        style: 'error'
+      }, 5))
+      
+    }
   }
+
+  const removeBlog = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      try {
+        dispatch(deleteBlog(blog))
+        dispatch(setNotification({
+          content: `Blog ${blog.title} removed`,
+          style: 'message'
+        }, 5))
+      } catch (error) {
+        dispatch(setNotification({
+          content: `Error removing blog: ${error.message}`,
+          style: 'error'
+        }, 5))
+      }
+    }
+  }
+  
+  const showWhenVisible = {display: visible ? '' : 'none'}
 
   const toggleLabel = () => {
     label === 'view' ? setLabel('hide') : setLabel('view')
   }
-
-  const handleRemoveClick = () => {
-    
-    handleRemove(blog)
-  }
-
   const showDeleteButton = {display: blog.user && blog.user.username === user.username ? '' : 'none'}
   
   const toggleVisibility = () => {
@@ -42,8 +69,8 @@ const Blog = ({ blog, handleLike, handleRemove,user }) => {
       <p>{blog.author}</p>
     <div style={showWhenVisible}>
       <p>{blog.url}</p>
-      <p><span data-testid='like'>{blog.likes}</span><button onClick={handleLikeCLick}>like</button></p>
-      <button style={showDeleteButton} onClick={handleRemoveClick}>remove</button>
+      <p><span data-testid='like'>{blog.likes}</span><button onClick={() => likeBlog(blog)}>like</button></p>
+      <button style={showDeleteButton} onClick={() => removeBlog(blog)}>remove</button>
     </div>  
   </div>
   )  

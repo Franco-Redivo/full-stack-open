@@ -1,12 +1,16 @@
 import "../styles/notification.css";
-const Notification = ({message, messageType}) => {
-    if (message === null){
+import { useSelector } from "react-redux";
+
+const Notification = () => {
+    const notification = useSelector(state => state.notifications)
+    
+    if (!notification || notification.content === ''){
         return null;
     }
 
     return(
-        <div className={messageType}>
-            {message}
+        <div className={notification.style}>
+            {notification.content}
         </div>
     );
 }
