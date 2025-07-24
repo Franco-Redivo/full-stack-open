@@ -1,0 +1,21 @@
+.message{
+    color: green;
+    background-color: lightgray;
+    border: solid 2px green;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.error{
+    color: red;
+    background-color: lightgray;
+    border: solid 2px red;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.main-title{
+    color: rgb(52, 163, 52);
+}
