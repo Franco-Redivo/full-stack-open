@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from '../reducers/notoficationReducer'
 import { like, deleteBlog } from '../reducers/blogReducer'
 import { useNavigate } from "react-router-dom"
+import Comments from './Comments'
 
 const Blog = ({ blog }) => {
 
@@ -71,6 +72,8 @@ const Blog = ({ blog }) => {
     
     {/* Show delete button only if the user is the owner of the blog */}
     <button style={showDeleteButton} onClick={() => removeBlog(blog)}>remove</button>
+
+    <Comments blogId={blog.id} />
       
   </div>
   )  

@@ -8,6 +8,7 @@ const loginRouter = require('./controllers/login')
 const middleware = require('./utils/middleware')
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
+const commentRouter = require('./controllers/comment')
 
 const app = express()
 
@@ -22,6 +23,7 @@ app.use(middleware.tokenExtractor)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/comments', commentRouter)
 
 if(process.env.NODE_ENV === 'test'){
     const testingRouter = require('./controllers/testing')
