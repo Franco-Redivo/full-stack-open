@@ -1,4 +1,6 @@
 import { useSelector } from "react-redux";
+import { ListGroup } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const UserDetails = ({ user }) => {
   if (!user) {
@@ -9,11 +11,13 @@ const UserDetails = ({ user }) => {
     <div>
       <h2>{user.name}</h2>
       <h3>Blogs created</h3>
-      <ul>
+      <ListGroup>
         {user.blogs.map(blog => (
-          <li key={blog.id}>{blog.title}</li>
+          <ListGroup.Item key={blog.id}>
+            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </ListGroup.Item>
         ))}
-      </ul>
+      </ListGroup>
     </div>
   );
 }

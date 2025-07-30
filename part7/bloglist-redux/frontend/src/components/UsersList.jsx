@@ -1,13 +1,14 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import Table from "react-bootstrap/Table";
 
 const UsersList = () => {
   const users = useSelector(state => state.users) || []
 
   return (
-    <div>
+    <div className="mt-3">
       <h2>Users</h2>
-      <table>
+      <Table striped bordered>
         <thead>
           <tr>
             <th>Name</th>
@@ -24,9 +25,10 @@ const UsersList = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
     </div>
   )
 }
+          
 
 export default UsersList

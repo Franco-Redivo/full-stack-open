@@ -3,6 +3,7 @@ import { setNotification } from '../reducers/notoficationReducer'
 import { createComment, fetchComments } from '../reducers/commentReducer'
 import { useEffect } from 'react'
 import { useField } from '../hooks/index'
+import { Button, Form, ListGroup } from 'react-bootstrap'
 
 
 const Comments = ({ blogId }) => {
@@ -15,11 +16,11 @@ const Comments = ({ blogId }) => {
         if (commentField.value.trim()) {
             try {
                 dispatch(createComment(blogId, { content: commentField.value }))
-                dispatch(setNotification(`Comment added: ${commentField.value}`, 5))
+                dispatch(setNotification({ content: `Comment added: ${commentField.value}`, style: 'success' }, 5))
                 commentReset()
             } catch (error) {
                 console.error('Error adding comment:', error)
-                dispatch(setNotification(`Error adding comment: ${error.message}`, 5))
+                dispatch(setNotification({ content: `Error adding comment: ${error.message}`, style: 'danger' }, 5))
             }
         }
     }
@@ -29,21 +30,23 @@ const Comments = ({ blogId }) => {
     }, [dispatch, blogId])
 
     return (
-        <div>
-            <h2>Comments</h2>
-            <ul>
+        <div className="mt-3">
+            <h3>Comments</h3>
+            <ListGroup>
                 {comments.map((comment) => (
-                    <li key={comment._id || comment.id}>{comment.content}</li>
+                    <ListGroup.Item className="list-group-item-dark" key={comment._id || comment.id}>{`"${comment.content}"`}</ListGroup.Item>
                 ))}
-            </ul>
-            <form onSubmit={handleCommentSubmit}>
-                <input
-                    placeholder="Add a comment"
-                    name="comment"
-                    {...commentField}
-                />
-                <button type="submit">Submit</button>
-            </form>
+            </ListGroup>
+            <Form className='mt-3' onSubmit={handleCommentSubmit}>
+                <Form.Group>
+                    <Form.Control
+                        placeholder="Add a comment"
+                        name="comment"
+                        {...commentField}
+                    />
+                </Form.Group>
+                <Button className='mt-2' type="submit">Submit</Button>
+            </Form>
         </div>
     )
 }

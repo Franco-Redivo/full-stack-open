@@ -54,14 +54,14 @@ const App = () => {
 
 
   return (
-    <div>
+    <div className = "container">
       <Notification/>
       <h1>Blog App</h1>
-      {user === null ? (
+      {/* {user === null ? (
         <Togglable buttonLabel='login'>
           <LoginForm/> 
         </Togglable>
-      ):(
+      ):( */}
         <>
           <Menu />
           <Routes>
@@ -69,9 +69,10 @@ const App = () => {
             <Route path="/" element={<BlogsList />} />
             <Route path="/users" element={<UsersList />} />
             <Route path="/users/:id" element={<UserDetails user={selectedUser} />} />
+            <Route path="/login" element={<LoginForm />} />
           </Routes>
         </>
-      )}
+      {/* )} */}
 
     </div>
   )

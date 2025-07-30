@@ -4,13 +4,17 @@ import { setNotification } from '../reducers/notoficationReducer'
 import { logIn } from '../reducers/userReducer'
 import blogService from '../services/blogs'
 import { useField } from "../hooks"
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import { useNavigate } from "react-router-dom"
 
 const LoginForm = () => { 
   const { onReset: usernameReset, ...username } = useField('text')
   const { onReset: passwordReset, ...password } = useField('password')
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
-  
+  const navigate = useNavigate()
+
   const handleLogin = async (event) => {
     event.preventDefault()
     
@@ -23,15 +27,16 @@ const LoginForm = () => {
       blogService.setToken(user.token)
       dispatch(setNotification({
         content: `Welcome ${user.name}`,
-        style: 'message'
+        style: 'success'
       }, 5))
   
       usernameReset()
       passwordReset()
+      navigate('/')
     } catch (exception) {
       dispatch(setNotification({
         content: 'Wrong credentials',
-        style: 'error'
+        style: 'danger'
       }, 5))
       console.error('Wrong credentials:', exception)
     }
@@ -40,22 +45,17 @@ const LoginForm = () => {
   return (
   <div>
     <h2>Log in to application</h2>
-    <form onSubmit = {handleLogin}>
-      <div>
-        username
-        <input data-testid='username'
-         name="Username"
-         {...username}/>
-      </div>
-      <div>
-        password
-          <input data-testid='password'
-          name="Password"
-          {...password}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
+    <Form onSubmit = {handleLogin}>
+      <Form.Group>
+        <Form.Label>Username</Form.Label>
+        <Form.Control data-testid='username' name="Username" {...username} />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>Password</Form.Label>
+        <Form.Control data-testid='password' name="Password" {...password} />
+      </Form.Group>
+      <Button type="submit">login</Button>
+    </Form>
   </div>
 )}
 

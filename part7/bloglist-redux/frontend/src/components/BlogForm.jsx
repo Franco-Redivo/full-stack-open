@@ -3,6 +3,8 @@ import { setNotification } from '../reducers/notoficationReducer'
 import { createBlog } from '../reducers/blogReducer'
 import { useField } from '../hooks/index'
 import { useNavigate } from 'react-router-dom'
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
 
 const BlogForm = () => {
   const dispatch = useDispatch()
@@ -30,7 +32,7 @@ const BlogForm = () => {
       }))
       dispatch(setNotification({
         content: `A new blog ${title.value} by ${author.value} added`,
-        style: 'message'
+        style: 'success'
       }, 5))
 
       titleReset()
@@ -42,39 +44,45 @@ const BlogForm = () => {
     } catch (error) {
       dispatch(setNotification({
         content: `Error adding blog: ${error.message}`,
-        style: 'error'
+        style: 'danger'
       },5))
       
     }
   }
     
   return (
-    <div>
+    <div className="mt-3 mb-3">
       <h2>Create new blog</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          title
-          <input data-testid='title' className="title"
+      <Form onSubmit={addBlog}>
+        <Form.Group>
+          <Form.Label>Title</Form.Label>
+          <Form.Control
+            data-testid='title'
+            className="title"
             name="title"
             {...title}
           />
-        </div>
-        <div>
-          author
-          <input data-testid='author' className="author"
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Author</Form.Label>
+          <Form.Control
+            data-testid='author'
+            className="author"
             name="author"
             {...author}
           />
-        </div>
-        <div>
-          url
-          <input data-testid='url' className="url"
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>URL</Form.Label>
+          <Form.Control
+            data-testid='url'
+            className="url"
             name="url"
             {...url}
           />
-        </div>
-        <button type="submit">create</button>
-      </form>
+        </Form.Group>
+        <Button className='mt-2' type="submit">create</Button>
+      </Form>
     </div>
   )
 }

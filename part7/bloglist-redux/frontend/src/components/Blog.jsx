@@ -5,6 +5,8 @@ import { setNotification } from '../reducers/notoficationReducer'
 import { like, deleteBlog } from '../reducers/blogReducer'
 import { useNavigate } from "react-router-dom"
 import Comments from './Comments'
+import { Button, Form } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 
 const Blog = ({ blog }) => {
 
@@ -17,25 +19,18 @@ const Blog = ({ blog }) => {
     return <div>Blog not found</div>
   }
   
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
   
   const likeBlog = async (blog) => {
     try {
       dispatch(like(blog))
       dispatch(setNotification({
         content: `Liked blog "${blog.title}"`,
-        style: 'message'
+        style: 'success'
       }, 5))
     } catch (error) {
       dispatch(setNotification({
         content: `Error liking blog: ${error.message}`,
-        style: 'error'
+        style: 'danger'
       }, 5))
       
     }
@@ -63,16 +58,19 @@ const Blog = ({ blog }) => {
 
 
   return(
-  <div style={blogStyle} className='blog'>
+  <div className='blog border p-3 mb-3 rounded'>
     <h2>{blog.title} by {blog.author}</h2>
-    
-    <p>{blog.url}</p>
-    <p><span data-testid='like'>{blog.likes}</span><button onClick={() => likeBlog(blog)}>like</button></p>
-    <p>added by {blog.user ? blog.user.name : 'unknown'}</p>
-    
-    {/* Show delete button only if the user is the owner of the blog */}
-    <button style={showDeleteButton} onClick={() => removeBlog(blog)}>remove</button>
 
+    <div className="d-flex flex-column gap-2">
+      <a href={blog.url}>{blog.url}</a>
+      <div className="d-flex align-items-center gap-2"><span data-testid='like'>{blog.likes}</span><Button variant="secondary" size="sm" onClick={() => likeBlog(blog)}>like</Button></div>
+      <div className="d-flex align-items-center gap-2">
+        <div>added by {blog.user ? 
+          <Link to={`/users/${blog.user.id}`}>{blog.user.name}</Link> : 'unknown'}</div>
+        <Button size="sm" variant="danger" style={showDeleteButton} onClick={() => removeBlog(blog)}>remove</Button>
+      </div>
+    </div>
+    
     <Comments blogId={blog.id} />
       
   </div>

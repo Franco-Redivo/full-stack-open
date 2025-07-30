@@ -1,5 +1,5 @@
-import "../styles/notification.css";
 import { useSelector } from "react-redux";
+import { Alert } from 'react-bootstrap';
 
 const Notification = () => {
     const notification = useSelector(state => state.notifications)
@@ -9,9 +9,9 @@ const Notification = () => {
     }
 
     return(
-        <div className={notification.style}>
+        <Alert variant={notification.style}>
             {notification.content}
-        </div>
+        </Alert>
     );
 }
 
