@@ -11,6 +11,7 @@ const ALL_AUTHORS = gql `
       name
       born
       bookCount
+      id
     }
   }
 `
