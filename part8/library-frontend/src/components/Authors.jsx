@@ -42,7 +42,7 @@ const Authors = ({show, authors}) => {
 
     editBirthyear({variables: {name, setBornTo: parseInt(born)}})
 
-    setName('')
+    // setName('')
     setBorn('')
   }
 
@@ -75,10 +75,11 @@ const Authors = ({show, authors}) => {
         <form onSubmit={submit}>
             <div>
                 name
-                <input
-                    value={name}
-                    onChange={({ target }) => setName(target.value)}
-                />
+                <select name="selectedAuthors" onChange={({ target }) => setName(target.value)}>
+                    {authors.map((a) => (
+                        <option key={a.id} value={a.name}>{a.name}</option>
+                    ))}
+                </select>
             </div>
             <div>
                 born
