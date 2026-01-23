@@ -1,5 +1,7 @@
 const { v4: uuid } = require('uuid')
 const { GraphQLError } = require('graphql')
+const { Author } = require('./models/author')
+const { Book } = require('./models/book')
 
 
 let authors = [
@@ -88,45 +90,84 @@ let books = [
 
 const resolvers = {
   Query: {
-    authorCount: () => authors.length,
-    bookCount: () => books.length,
-    allBooks: (root, args) => {
+    authorCount: async () => Author.collection.countDocuments(),
+    bookCount: async () => Book.collection.countDocuments(),
+    allBooks: async (root, args) => {
       if(args.genre && args.author) {
-        const authorList = books.filter((book) => book.author === args.author)
-        const authorGenre = authorList.filter((book) => book.genres.includes(args.genre))
-        return authorGenre
+        const author = await Author.findOne({name: args.author})
+
+        if(!author){
+            return []
+        }
+
+        return Book.find({author: author._id, genres: args.genre}).populate('author')
       }
-      if(args.author) return books.filter((book) => book.author === args.author)
-      if(args.genre) return books.filter((book) => book.genres.includes(args.genre))
+      if(args.author){
+          const author = await Author.findOne({name: args.author})
+          if(!author) return []
+          return Book.find({author: author._id}).populate('author')
+        } 
+      if(args.genre) return Book.find({genres: args.genre}).populate('author')
           
-      return books
+      return Book.find({}).populate('author')
     },
-    allAuthors: () => authors,
+    allAuthors: async () => Author.find({}),
   },
   Author: {
-    bookCount: (root) => books.filter((book) => book.author == root.name).length
+    bookCount: async (root) => Book.collection.countDocuments({author: root._id})
   },
   Mutation: {
-    addBook: (root, args) => {
-        const book = { ...args, id: uuid()}
-        const authorExists = authors.find((author) => author.name === args.author)
-        if(!authorExists){
-            const author = {
-                name: args.author,
-                id: uuid(),
-                bookCount: 1
+    addBook: async (root, args) => {
+        let author = await Author.findOne( {name: args.author })
+
+        if(!author){
+            author = new Author({ name: args.author })
+            try {
+                await author.save()
+            } catch (error) {
+                throw new GraphQLError('Saving author failed', {
+                    extensions: {
+                        code: 'BAD_USER_INPUT',
+                        error,
+                    },
+                })
             }
-            authors = authors.concat(author)
         }
-        books = books.concat(book)
-        return book
+        const book = new Book({
+            title: args.title,
+            published: args.published,
+            genres: args.genres,
+            author: author._id,
+        })
+
+        try{
+            return await book.save()
+        }catch (error) {
+            throw new GraphQLError('Saving book failed', {
+                extensions: {
+                    code: 'BAD_USER_INPUT',
+                    error,
+                },
+            })
+
+        }
+        return book.save()
     },
-    editAuthor: (root, args) => {
-        const author = authors.find(a => a.name === args.name)
-        if(!author) return null
-        const updatedAuthor = { ...author, born: args.setBornTo}
-        authors = authors.map(a => a.name === args.name ? updatedAuthor : a)
-        return updatedAuthor
+    editAuthor: async (root, args) => {
+        try {
+            return await Author.findOneAndUpdate(
+                {name: args.name},
+                {born: args.setBornTo},
+                {new: true}
+            )
+        } catch (error){
+            throw new GraphQLError('updating author failed', {
+                extensions: {
+                    code: 'BAD_USER_INPUT',
+                    error,
+                },
+            })
+        }
     }
   }
 }
