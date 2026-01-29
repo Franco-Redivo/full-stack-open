@@ -16,7 +16,10 @@ const CREATE_BOOK = gql`
             genres: $genres
         )  {
                 title
-                author
+                author{
+                  id
+                  name
+                }
                 published
                 id
                 genres
@@ -29,7 +32,10 @@ const ALL_BOOKS = gql `
     allBooks {
       id
       title
-      author
+      author{
+        id
+        name
+      }
       published
     }
   }
