@@ -42,7 +42,7 @@ const Blog = ({ blog, handleLike, handleRemove,user }) => {
       <p>{blog.author}</p>
     <div style={showWhenVisible}>
       <p>{blog.url}</p>
-      <p>{blog.likes} <button onClick={handleLikeCLick}>like</button></p>
+      <p><span data-testid='like'>{blog.likes}</span><button onClick={handleLikeCLick}>like</button></p>
       <button style={showDeleteButton} onClick={handleRemoveClick}>remove</button>
     </div>  
   </div>
