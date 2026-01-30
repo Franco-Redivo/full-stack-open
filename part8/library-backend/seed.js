@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 const Author = require('./models/author')
 const Book = require('./models/book')
+const User = require('./models/user')
 
 mongoose.connect(process.env.MONGODB_URI)
 
@@ -9,6 +10,13 @@ mongoose.connect(process.env.MONGODB_URI)
 const seed = async () => {
     await Author.deleteMany({})
     await Book.deleteMany({})
+    await User.deleteMany({})
+
+    const user_robert = new User({ username: 'robert', favoriteGenre: 'refactoring' })
+    const user_fowler = new User({ username: 'fowler', favoriteGenre: 'design' })
+
+    await user_robert.save()
+    await user_fowler.save()
 
     const robert = new Author({ name: 'Robert Martin', born: 1952 })
     const fowler = new Author({ name: 'Martin Fowler', born: 1963 })
