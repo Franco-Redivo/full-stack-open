@@ -30,17 +30,29 @@ const ALL_AUTHORS = gql `
     }
 `
 
-const Authors = ({show, authors}) => {
+const Authors = ({show, authors, setError, token}) => {
   const [ name, setName ] = useState('');
   const [ born, setBorn ] = useState('');
   const [editBirthyear] = useMutation(EDIT_BIRTHYEAR, {
-    refetchQueries: [{ query: ALL_AUTHORS }]
+    update: (cache, response) => {
+      cache.updateQuery({ query: ALL_AUTHORS}, ({ allAuthors }) => {
+        return {
+          allAuthors: allAuthors.concat(response.data.editBirthyear)
+        }
+      })
+    },
   })
 
   const submit = async (event) => {
     event.preventDefault()
 
-    editBirthyear({variables: {name, setBornTo: parseInt(born)}})
+    try{
+      await editBirthyear({variables: {name, setBornTo: parseInt(born)}})
+
+    }catch(error){
+      setError(error.message)
+    }
+
 
     // setName('')
     setBorn('')
@@ -70,28 +82,31 @@ const Authors = ({show, authors}) => {
           ))}
         </tbody>
       </table>
-      <div>
-        <h3>Set Birthyear</h3>
-        <form onSubmit={submit}>
-            <div>
-                name
-                <select name="selectedAuthors" onChange={({ target }) => setName(target.value)}>
-                    {authors.map((a) => (
-                        <option key={a.id} value={a.name}>{a.name}</option>
-                    ))}
-                </select>
-            </div>
-            <div>
-                born
-                <input
-                    type= "number"
-                    value={born}
-                    onChange={({ target }) => setBorn(target.value)}
-                />
-            </div>
-            <button type="submit">update author</button>
-        </form>
-      </div>
+        {token != null && (
+        <div>
+          <h3>Set Birthyear</h3>
+          <form onSubmit={submit}>
+              <div>
+                  name
+                  <select name="selectedAuthors" onChange={({ target }) => setName(target.value)}>
+                      {authors.map((a) => (
+                          <option key={a.id} value={a.name}>{a.name}</option>
+                      ))}
+                  </select>
+              </div>
+              <div>
+                  born
+                  <input
+                      type= "number"
+                      value={born}
+                      onChange={({ target }) => setBorn(target.value)}
+                  />
+              </div>
+              <button type="submit">update author</button>
+          </form>
+        </div>
+        )
+        }
 
         
     </div>
