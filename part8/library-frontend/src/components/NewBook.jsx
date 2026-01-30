@@ -51,7 +51,7 @@ const ALL_AUTHORS = gql `
     }
 `
 
-const NewBook = (props) => {
+const NewBook = ({show, setError}) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
@@ -65,14 +65,19 @@ const NewBook = (props) => {
     ]
   })
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
   const submit = async (event) => {
     event.preventDefault()
 
-    createBook({ variables: {title, author, published: parseInt(published), genres}})
+    try{
+      await createBook({ variables: {title, author, published: parseInt(published), genres}})
+
+    }catch (error) {
+      setError(error.message)
+    }
 
     setTitle('')
     setPublished('')
