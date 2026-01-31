@@ -3,9 +3,11 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import Notify from './components/Notify'
+import RecommendedBooks from './components/RecommendedBooks'
 import LoginForm from './components/LoginForm'
 import { gql } from '@apollo/client'
 import { useQuery, useApolloClient } from '@apollo/client/react'
+import './App.css'
 
 const ALL_AUTHORS = gql `
   query {
@@ -27,6 +29,7 @@ const ALL_BOOKS = gql `
         name
       }
       published
+      genres
     }
   }
 `
@@ -38,7 +41,7 @@ const App = () => {
 
   const authorsQueryResult = useQuery(ALL_AUTHORS)
   const booksQueryResult = useQuery(ALL_BOOKS)
-  const client = useApolloClient
+  const client = useApolloClient()
 
   if(authorsQueryResult.loading || booksQueryResult.loading){
     return <div>Loading...</div>
@@ -70,22 +73,23 @@ const App = () => {
 
 
   return (
-    <div>
-      <div>
+    <div className='app-wrapper'>
+      <div className='nav-bar'>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
+        <button onClick={() => setPage('recommended')}>recommended</button>
         {!token ? 
           <button onClick={() => setPage('login')} >Login</button>
           :
-          <div>
+          <div className='nav-bar'>
             <button onClick={() => setPage('add')}>add book</button>
             <button onClick={onLogout} >Logout</button>
           </div>
           
-          
         }
         
       </div>
+      <Notify errorMessage={errorMessage} />
 
       <Authors show={page === 'authors'} token={token} setError={notify} authors={authorsQueryResult.data?.allAuthors || []} />
 
@@ -94,6 +98,8 @@ const App = () => {
       <NewBook show={page === 'add'} setError={notify} />
 
       <LoginForm show={page === 'login'} setError={notify} setToken={setToken} setPage={setPage}/>
+
+      <RecommendedBooks show={page === 'recommended'} />
     </div>
     
   )
