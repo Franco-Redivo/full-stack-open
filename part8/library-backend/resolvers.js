@@ -34,6 +34,9 @@ const resolvers = {
     me: (root, args, context) => {
         return context.currentUser
     },
+    allGenres: async () => {
+        return await Book.distinct('genres')
+    }
   },
   Author: {
     bookCount: async (root) => Book.collection.countDocuments({author: root._id})
