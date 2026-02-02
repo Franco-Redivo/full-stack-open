@@ -19,20 +19,6 @@ const ALL_AUTHORS = gql `
     }
   }
 `
-const ALL_BOOKS = gql `
-  query {
-    allBooks {
-      id
-      title
-      author{
-        id
-        name
-      }
-      published
-      genres
-    }
-  }
-`
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -40,10 +26,9 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
 
   const authorsQueryResult = useQuery(ALL_AUTHORS)
-  const booksQueryResult = useQuery(ALL_BOOKS)
   const client = useApolloClient()
 
-  if(authorsQueryResult.loading || booksQueryResult.loading){
+  if(authorsQueryResult.loading) {
     return <div>Loading...</div>
   }
 
@@ -93,7 +78,7 @@ const App = () => {
 
       <Authors show={page === 'authors'} token={token} setError={notify} authors={authorsQueryResult.data?.allAuthors || []} />
 
-      <Books show={page === 'books'} books={booksQueryResult.data?.allBooks || []} />
+      <Books show={page === 'books'} />
 
       <NewBook show={page === 'add'} setError={notify} />
 
