@@ -37,7 +37,11 @@ const Authors = ({show, authors, setError, token}) => {
     update: (cache, response) => {
       cache.updateQuery({ query: ALL_AUTHORS}, ({ allAuthors }) => {
         return {
-          allAuthors: allAuthors.concat(response.data.editBirthyear)
+          allAuthors: allAuthors.map(author => 
+            author.id === response.data.editAuthor.id 
+              ? response.data.editAuthor 
+              : author
+          )
         }
       })
     },
