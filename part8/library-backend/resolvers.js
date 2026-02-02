@@ -85,6 +85,7 @@ const resolvers = {
                     code: 'BAD_USER_INPUT',
                     invalidArgs: args.title,
                     error: error.message,
+                    details: error,
                 },
             })
 
