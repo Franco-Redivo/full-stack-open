@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { gql } from '@apollo/client'
-import { useMutation } from '@apollo/client/react'
+import { useMutation, useQuery } from '@apollo/client/react'
 
 const CREATE_BOOK = gql`
     mutation createBook(
@@ -44,11 +44,38 @@ const ALL_AUTHORS = gql `
     query {
         allAuthors {
             name
-            born
-            bookCount
             id
         }
     }
+`
+
+const ALL_GENRES = gql `
+  query {
+    allGenres
+  }
+`
+
+const FAVORITE_GENRE = gql `
+  query favoriteGenre {
+    me {
+        favoriteGenre
+    }
+  }
+`
+
+const FAVORITE_BOOKS = gql `
+  query favoriteBooks($genre: String!) {
+    allBooks(genre: $genre) {
+      id
+      title
+      author {
+        id
+        name
+      }
+      published
+      genres
+    }
+  }
 `
 
 const NewBook = ({show, setError}) => {
@@ -58,11 +85,29 @@ const NewBook = ({show, setError}) => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
 
+  const favoriteGenreResult = useQuery(FAVORITE_GENRE, {
+    skip: !show
+  })
+
+  const favoriteGenre = favoriteGenreResult.data?.me?.favoriteGenre
+
   const [createBook] = useMutation(CREATE_BOOK, {
-    refetchQueries: [
+    refetchQueries: () => {
+      const queries = [
         { query: ALL_BOOKS },
-        { query: ALL_AUTHORS }
-    ]
+        { query: ALL_AUTHORS },
+        { query: ALL_GENRES }
+      ]
+
+      if (favoriteGenre) {
+        queries.push({
+          query: FAVORITE_BOOKS,
+          variables: { genre: favoriteGenre }
+        })
+      }
+
+      return queries
+    }
   })
 
   if (!show) {
@@ -74,16 +119,14 @@ const NewBook = ({show, setError}) => {
 
     try{
       await createBook({ variables: {title, author, published: parseInt(published), genres}})
-
+      setTitle('')
+      setPublished('')
+      setAuthor('')
+      setGenres([])
+      setGenre('')
     }catch (error) {
       setError(error.message)
     }
-
-    setTitle('')
-    setPublished('')
-    setAuthor('')
-    setGenres([])
-    setGenre('')
   }
 
   const addGenre = () => {
