@@ -25,12 +25,15 @@ const FAVORITE_BOOKS = gql `
 
 const RecommendedBooks = ( {show} ) => {
     
-    const favoriteGenreResult = useQuery(FAVORITE_GENRE)
+    const favoriteGenreResult = useQuery(FAVORITE_GENRE, {
+        skip: !show
+    })
 
     const genre = favoriteGenreResult.data?.me.favoriteGenre
 
     const favoriteBooksResult = useQuery(FAVORITE_BOOKS, {
         variables: { genre: genre },
+        skip: !show || !genre
     })
 
     if (!show) {
@@ -52,7 +55,7 @@ const RecommendedBooks = ( {show} ) => {
                         <th>author</th>
                         <th>published</th>
                     </tr>
-                    {favoriteBooksResult.data.allBooks.map((a) => (
+                    {favoriteBooksResult.data?.allBooks.map((a) => (
                         <tr key={a.id}>
                             <td>{a.title}</td>
                             <td>{a.author?.name}</td>
