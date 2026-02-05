@@ -1,11 +1,12 @@
 require('dotenv').config()
+const { PubSub } = require('graphql-subscriptions')
 const { GraphQLError } = require('graphql')
 const Author = require('./models/author')
 const Book = require('./models/book')
 const User = require('./models/user')
 const jwt = require('jsonwebtoken')
 
-
+const pubSub = new PubSub()
 
 const resolvers = {
   Query: {
@@ -78,7 +79,10 @@ const resolvers = {
         try{
             const saved = await book.save()
             await saved.populate('author')
+
+            pubSub.publish('BOOK_ADDED', { bookAdded: saved })
             return saved
+
         }catch (error) {
             throw new GraphQLError('Saving book failed', {
                 extensions: {
@@ -156,7 +160,13 @@ const resolvers = {
 
     },
 
-  }
+  },
+  
+  Subscription: {
+    bookAdded: {
+        subscribe: () => pubSub.asyncIterableIterator('BOOK_ADDED')
+    },
+  },
 }
 
 module.exports = resolvers
