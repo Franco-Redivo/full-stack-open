@@ -1,27 +1,6 @@
-import { gql } from "@apollo/client"
 import { useQuery } from "@apollo/client/react"
+import { FAVORITE_GENRE, FAVORITE_BOOKS } from "../queries"
 
-const FAVORITE_GENRE = gql `
-  query favoriteGenre {
-    me {
-        favoriteGenre
-    }
-  }
-`
-const FAVORITE_BOOKS = gql `
-  query favoriteBooks($genre: String!) {
-    allBooks(genre: $genre) {
-      id
-      title
-      author {
-        id
-        name
-      }
-      published
-      genres
-    }
-}
-`
 
 const RecommendedBooks = ( {show} ) => {
     
