@@ -5,20 +5,10 @@ import NewBook from './components/NewBook'
 import Notify from './components/Notify'
 import RecommendedBooks from './components/RecommendedBooks'
 import LoginForm from './components/LoginForm'
-import { gql } from '@apollo/client'
-import { useQuery, useApolloClient } from '@apollo/client/react'
+import { useQuery, useApolloClient, useSubscription } from '@apollo/client/react'
+import { ALL_AUTHORS, BOOK_ADDED } from './queries'
 import './App.css'
 
-const ALL_AUTHORS = gql `
-  query {
-    allAuthors {
-      name
-      born
-      bookCount
-      id
-    }
-  }
-`
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -27,6 +17,16 @@ const App = () => {
 
   const authorsQueryResult = useQuery(ALL_AUTHORS)
   const client = useApolloClient()
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const bookAdded = data?.data?.bookAdded
+      if (!bookAdded) {
+        return
+      }
+      notify(`${bookAdded.title} added`)
+    },
+  })
 
   if(authorsQueryResult.loading) {
     return <div>Loading...</div>
