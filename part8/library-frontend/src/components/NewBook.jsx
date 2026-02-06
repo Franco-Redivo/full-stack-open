@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client/react'
 import { FAVORITE_GENRE, FAVORITE_BOOKS, ALL_GENRES, ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from '../queries'
-
+import { addBookToCache } from '../utils/apolloCache'
 
 const NewBook = ({show, setError}) => {
   const [title, setTitle] = useState('')
@@ -17,22 +17,87 @@ const NewBook = ({show, setError}) => {
   const favoriteGenre = favoriteGenreResult.data?.me?.favoriteGenre
 
   const [createBook] = useMutation(CREATE_BOOK, {
-    refetchQueries: () => {
-      const queries = [
-        { query: ALL_BOOKS },
-        { query: ALL_AUTHORS },
-        { query: ALL_GENRES }
-      ]
+    onError: (error) => setError(error.message),
+    update: (cache, response) => {
+      const addedBook = response.data.addBook
+      addBookToCache(cache, addedBook)
+
+      cache.updateQuery({ query: ALL_AUTHORS}, (data) => {
+        if (!data?.allAuthors) {
+          return { allAuthors: [addedBook.author] }
+        }
+
+        const authorExists = data.allAuthors.some(
+          author => author.name === addedBook.author.name
+        )
+
+        if(authorExists) {
+          return { allAuthors: data.allAuthors }
+        }
+
+        return {
+          allAuthors: data.allAuthors.concat(addedBook.author),
+        }
+      })
+
+      cache.updateQuery({ query: ALL_GENRES}, (data) => {
+        if (!data?.allGenres) {
+          return { allGenres: addedBook.genres }
+        }
+
+        const genresToAdd = addedBook.genres.filter(
+          genre => !data.allGenres.includes(genre)
+        )
+
+        if(genresToAdd.length === 0) {
+          return { allGenres: data.allGenres }
+        }
+
+        return {
+          allGenres: data.allGenres.concat(genresToAdd),
+        }
+      })
 
       if (favoriteGenre) {
-        queries.push({
-          query: FAVORITE_BOOKS,
-          variables: { genre: favoriteGenre }
-        })
-      }
+        cache.updateQuery(
+          { query: FAVORITE_BOOKS, variables: { genre: favoriteGenre } },
+          (data) => {
+            if (!data?.favoriteBooks) {
+              if (addedBook.genres.includes(favoriteGenre)) {
+                return { favoriteBooks: [addedBook] }
+              }
 
-      return queries
+              return data
+            }
+
+            if (addedBook.genres.includes(favoriteGenre)) {
+              return {
+                favoriteBooks: data.favoriteBooks.concat(addedBook),
+              }
+            } else {
+              return { favoriteBooks: data.favoriteBooks }
+            }
+          }
+        )
+      }
     }
+
+    // refetchQueries: () => {
+    //   const queries = [
+    //     { query: ALL_BOOKS },
+    //     { query: ALL_AUTHORS },
+    //     { query: ALL_GENRES }
+    //   ]
+
+    //   if (favoriteGenre) {
+    //     queries.push({
+    //       query: FAVORITE_BOOKS,
+    //       variables: { genre: favoriteGenre }
+    //     })
+    //   }
+
+    //   return queries
+    // }
   })
 
   if (!show) {
