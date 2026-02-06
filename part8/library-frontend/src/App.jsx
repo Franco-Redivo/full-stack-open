@@ -7,6 +7,7 @@ import RecommendedBooks from './components/RecommendedBooks'
 import LoginForm from './components/LoginForm'
 import { useQuery, useApolloClient, useSubscription } from '@apollo/client/react'
 import { ALL_AUTHORS, BOOK_ADDED } from './queries'
+import { addBookToCache } from './utils/apolloCache'
 import './App.css'
 
 
@@ -25,6 +26,7 @@ const App = () => {
         return
       }
       notify(`${bookAdded.title} added`)
+      addBookToCache(client.cache, bookAdded)
     },
   })
 
