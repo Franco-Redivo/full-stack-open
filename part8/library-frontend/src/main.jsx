@@ -4,12 +4,12 @@ import './index.css'
 import App from './App.jsx'
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client'
 import { ApolloProvider } from '@apollo/client/react'
-import { setContextLink } from '@apollo/client/link/context'
+import { SetContextLink } from '@apollo/client/link/context'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { getMainDefinition } from '@apollo/client/utilities'
 import { createClient } from 'graphql-ws'
 
-const authLink = setContextLink(({ headers }) => {
+const authLink = new SetContextLink(({ headers }) => {
   const token = localStorage.getItem('user-token')
   return {
     headers: {
