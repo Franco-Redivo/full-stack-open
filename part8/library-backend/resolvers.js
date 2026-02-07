@@ -31,10 +31,21 @@ const resolvers = {
           
       return Book.find({}).populate('author')
     },
-    allAuthors: async () => {
-        console.log('allAuthors find')
-        return Author.find({})
-    },
+        allAuthors: async () => {
+                console.log('allAuthors aggregate')
+                return Author.aggregate([
+                    {
+                        $lookup: {
+                            from: 'books',
+                            localField: '_id',
+                            foreignField: 'author',
+                            as: 'books'
+                        }
+                    },
+                    { $addFields: { bookCount: { $size: '$books' }, id: { $toString: '$_id' } } },
+                    { $project: { books: 0 } }
+                ])
+        },
     me: (root, args, context) => {
         return context.currentUser
     },
@@ -42,12 +53,13 @@ const resolvers = {
         return await Book.distinct('genres')
     }
   },
-  Author: {
-    bookCount: async (root) => { 
-        console.log('bookCount find')
-        return Book.collection.countDocuments({author: root._id}) 
-    }
-  },
+// Added agregate lookup for bookCount, so no need for separate resolver  
+//   Author: {
+//     bookCount: async (root) => { 
+//         console.log('bookCount find')
+//         return Book.collection.countDocuments({author: root._id}) 
+//     }
+//   },
   Mutation: {
     addBook: async (root, args, context) => {
         const currentUser = context.currentUser
