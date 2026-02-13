@@ -17,7 +17,7 @@ const bmiParseArguments = (args: string[]): BmiValues => {
     }
 }
 
-const calculateBmi = (height: number, weight: number): string => {
+export const calculateBmi = (height: number, weight: number): string => {
     const heightInMeters: number = height / 100;
     const bmi: number = weight / Math.pow(heightInMeters,2);
     let clasification: string;
@@ -37,14 +37,16 @@ const calculateBmi = (height: number, weight: number): string => {
 }
 
 //underweight (under 18.5 ), normal weight (18.5 to 24.9), overweight (25 to 29.9), and obese (30 or more)
-try{
-    const { height, weight } = bmiParseArguments(process.argv);
-    console.log(calculateBmi(height, weight));
-}catch(error: unknown){
-    let errorMessage: string = 'something went wrong';
-    if( error instanceof Error ){
-        errorMessage += error.message;
-    }
+if (require.main === module) {
+    try{
+        const { height, weight } = bmiParseArguments(process.argv);
+        console.log(calculateBmi(height, weight));
+    }catch(error: unknown){
+        let errorMessage: string = 'something went wrong';
+        if( error instanceof Error ){
+            errorMessage += error.message;
+        }
 
-    console.log(errorMessage);
+        console.log(errorMessage);
+    }
 }
