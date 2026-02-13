@@ -38,7 +38,7 @@ const calculateExercises = (exerciseHours: number[], target: number): Results =>
     let sumOfHours: number = exerciseHours.reduce((sum, current) => sum += current, 0);
     const average: number = sumOfHours / numerOfDays;
     const success: boolean = average >= target ? true : false;
-    let rating: number;
+    let rating: number = 0;
     const ratingDescriptions : string[] = ['very bad', 'not bad but could be better', 'very good'];
 
     if(average / target >= 1){
