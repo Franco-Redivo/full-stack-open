@@ -16,7 +16,7 @@ const exerciseParseArguments = (args: string[]): ExerciseValues => {
     if(args.length < 4) throw new Error('Not enough arguments');
     if(isNaN(Number(args[2]))) throw new Error('Target has to be a number');
 
-    let hoursArray: number[] = []; 
+    const hoursArray: number[] = []; 
 
     for(let i: number = 3; i < args.length; i++){
         if(isNaN(Number(args[i]))){
@@ -28,14 +28,14 @@ const exerciseParseArguments = (args: string[]): ExerciseValues => {
     return{
         target: Number(args[2]),
         hoursArray: hoursArray
-    }
+    };
 
-}
+};
 
-const calculateExercises = (exerciseHours: number[], target: number): Results => {
+export const calculateExercises = (exerciseHours: number[], target: number): Results => {
     const numerOfDays: number = exerciseHours.length;
     let trainingDays: number = 0;
-    let sumOfHours: number = exerciseHours.reduce((sum, current) => sum += current, 0);
+    const sumOfHours: number = exerciseHours.reduce((sum, current) => sum + current, 0);
     const average: number = sumOfHours / numerOfDays;
     const success: boolean = average >= target ? true : false;
     let rating: number = 0;
@@ -53,7 +53,7 @@ const calculateExercises = (exerciseHours: number[], target: number): Results =>
         if( hours > 0 ){
             trainingDays++;
         }
-    })
+    });
 
     return{
         periodLength: numerOfDays,
@@ -63,8 +63,8 @@ const calculateExercises = (exerciseHours: number[], target: number): Results =>
         ratingDescription: ratingDescriptions[rating - 1],
         target: target,
         average: average
-    }
-}
+    };
+};
 
 try{
     const { target, hoursArray } = exerciseParseArguments(process.argv);
