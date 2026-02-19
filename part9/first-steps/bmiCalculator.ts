@@ -11,11 +11,11 @@ const bmiParseArguments = (args: string[]): BmiValues => {
         return{
             height: Number(args[2]),
             weight: Number(args[3])
-        }
+        };
     }else{
         throw new Error('Provided arguments were not numbers!');
     }
-}
+};
 
 export const calculateBmi = (height: number, weight: number): string => {
     const heightInMeters: number = height / 100;
@@ -34,7 +34,7 @@ export const calculateBmi = (height: number, weight: number): string => {
 
     return clasification;
 
-}
+};
 
 //underweight (under 18.5 ), normal weight (18.5 to 24.9), overweight (25 to 29.9), and obese (30 or more)
 if (require.main === module) {
