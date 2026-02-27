@@ -39,6 +39,7 @@ app.get('/exercises', (req, res) => {
     return res.send({result});
 });
 
+
 const PORT = 3003;
 
 app.listen(PORT, () => {
