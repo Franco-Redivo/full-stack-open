@@ -1,8 +1,10 @@
 import express from 'express';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import patientsService from '../services/patientsService';
-import { NonSensitivePatientEntry } from '../types';
-import toNewPatientEntry from '../utils';
+import { NewPatientEntry, NonSensitivePatientEntry, PatientsEntry } from '../types';
+//import {toNewPatientEntry} from '../utils';
+//import { z } from 'zod';
+import { errorMiddleware, newPatientParser } from '../middlewares';
 
 const router = express.Router();
 
@@ -20,20 +22,13 @@ router.get('/:id', (req, res: Response<NonSensitivePatientEntry>) => {
     }
 });
 
-router.post('/', (req, res) => {
-    try{
-        const newPatientEntry = toNewPatientEntry(req.body);
-        const addedPatient = patientsService.addPatient(newPatientEntry);
-        res.json(addedPatient);
-    } catch (error: unknown){
-        let errorMessage = ' Something went wrong. ';
-        if (error instanceof Error){
-            errorMessage += ' Error: ' + error.message;
-        }
-        res.status(400).send(errorMessage);
-    }
+router.post('/',newPatientParser, (req: Request<unknown,unknown,NewPatientEntry>, res: Response<PatientsEntry>) => {
+    const addedPatient = patientsService.addPatient(req.body);
+    res.json(addedPatient); 
     
 
 });
+
+router.use(errorMiddleware);
 
 export default router;
