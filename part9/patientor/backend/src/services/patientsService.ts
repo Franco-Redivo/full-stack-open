@@ -16,17 +16,19 @@ const getNonSensitivePatientsEntries = (): NonSensitivePatientEntry[] => {
     }));
 };
 
-const findById = (id: string) : NonSensitivePatientEntry | undefined => {
+const findById = (id: string) : PatientsEntry | undefined => {
     const patient = patients.find(p => p.id === id);
+    console.log(patient);
     if (!patient) return undefined;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { ssn, ...nonSensitive } = patient;
-    return nonSensitive as NonSensitivePatientEntry;
+    // -eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //const { ssn,entries, ...nonSensitive } = patient;
+    return patient;
 };
 
 const addPatient = (entry: NewPatientEntry): PatientsEntry => {
-    const newPatientEntry = {
+    const newPatientEntry: PatientsEntry = {
         id: uuid(),
+        entries: [],
         ...entry
     };
 
