@@ -18,7 +18,6 @@ const getNonSensitivePatientsEntries = (): NonSensitivePatientEntry[] => {
 
 const findById = (id: string) : PatientsEntry | undefined => {
     const patient = patients.find(p => p.id === id);
-    console.log(patient);
     if (!patient) return undefined;
     // -eslint-disable-next-line @typescript-eslint/no-unused-vars
     //const { ssn,entries, ...nonSensitive } = patient;
