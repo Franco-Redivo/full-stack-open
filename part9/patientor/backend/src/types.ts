@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { newEntrySchema } from './utils';
+import { newPatientEntrySchema, newBaseEntrySchema, newHealthCheckEntrySchema, newHospitalEntrySchema, newOccupationalHealthcareEntrySchema } from './utils';
 export interface DiagnosesEntry {
     code: string;
     name: string;
@@ -27,7 +27,7 @@ interface BaseEntry {
     description: string;
     date: string;
     specialist: string;
-    diagnosisCodes?: Array<DiagnosesEntry['code']>;
+    diagnosisCodes?: Array<DiagnosesEntry['code']> | undefined;
 }
 
 export enum HealthCheckRating {
@@ -60,11 +60,26 @@ interface HospitalEntry extends BaseEntry {
 interface OccupationalHealthcareEntry extends BaseEntry {
     type: "OccupationalHealthcare";
     employerName: string;
-    sickLeave?: SickLeave;
+    sickLeave?: SickLeave | undefined;
 }
+
+// Define special omit for unions
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
 
 export type Entry = HospitalEntry | OccupationalHealthcareEntry | HealthCheckEntry;
 
+export type EntryWithoutId = UnionOmit<Entry, 'id'>;
+
+export type NewBaseEntry = z.infer<typeof newBaseEntrySchema>;
+
+export type NewHealthCheckEntry = z.infer<typeof newHealthCheckEntrySchema>;
+
+export type NewHospitalEntry = z.infer<typeof newHospitalEntrySchema>;
+
+export type NewOccupationalHealthcareEntry = z.infer<typeof newOccupationalHealthcareEntrySchema>;
+
+export type NewEntry = NewHealthCheckEntry | NewHospitalEntry | NewOccupationalHealthcareEntry;
+
 export type NonSensitivePatientEntry = Omit<PatientsEntry, 'ssn' | 'entries'>;
 
-export type NewPatientEntry = z.infer<typeof newEntrySchema>;
+export type NewPatientEntry = z.infer<typeof newPatientEntrySchema>;
