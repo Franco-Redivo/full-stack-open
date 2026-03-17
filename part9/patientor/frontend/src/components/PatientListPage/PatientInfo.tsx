@@ -1,9 +1,11 @@
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
+import { useEffect, useState } from 'react';
 import HealthCheckEntry from '../EntryDetails/HealthCheckEntry';
 import HospitalEntry from '../EntryDetails/HospitalEntry';
 import OccupationalHealthcareEntry from '../EntryDetails/OccupationalHealthcareEntry';
 import type { Patient, Diagnosis, Entry } from "../../types";
+import EntryForm from './EntryForm/EntryForm';
 
 interface Props {
   patient: Patient | null;
@@ -11,9 +13,16 @@ interface Props {
 }
 
 const PatientInfo = ({ patient, diagnoses }: Props) => {
+    const [entries, setEntries] = useState<Entry[]>([]);
+
+    useEffect(() => {
+        setEntries(patient?.entries ?? []);
+    }, [patient]);
+
     if(!patient) {
         return <div>Patient not found</div>;
     }
+
     console.log(patient);
     const genderIcon = patient.gender === 'female' ? <FemaleIcon /> : <MaleIcon />;
 
@@ -36,18 +45,19 @@ const PatientInfo = ({ patient, diagnoses }: Props) => {
             <h2>{patient.name} {genderIcon}</h2>
             <p>SSN: {patient.ssn}</p>
             <p>Occupation: {patient.occupation}</p>
+            <EntryForm patientId={patient.id} onEntryAdded={(entry) => setEntries((prev) => prev.concat(entry))} />
             <div>
                 <h3>Entries</h3>
-                {patient.entries.length === 0 ? (
+                {entries.length === 0 ? (
                     <p>No entries available.</p>
                 ) : (
                     <div>
-                        {patient.entries.map((entry) => (
+                        {entries.map((entry) => (
                             <div key={entry.id}>
                                 {entryDetails(entry)}
                             </div>
                         ))}
-                        {patient.entries.map((entry) => (
+                        {entries.map((entry) => (
                             <ul key={entry.id}>
                                 {entry.diagnosisCodes && entry.diagnosisCodes.map(code => (
                                     <li key={code}>{code} : <span> {diagnoses.find(d => d.code === code)?.name}</span></li>
